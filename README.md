@@ -91,7 +91,7 @@ LIMIT 5;
 ### 1.5 Individual column distribution
 Let's now take a look at the most frequent values accross each column.
 
-1. Measure Value Column
+1. <u>Measure Value Column</u>
 ```
 SELECT 
   measure_value,
@@ -115,7 +115,7 @@ LIMIT 10;
 | 128           | 319       |
 | 115           | 319       |
 
-2. Systolic column
+2. <u>Systolic column</u>
 ```
 SELECT 
   systolic,
@@ -141,7 +141,7 @@ LIMIT 10;
 
 Wow. So many null and zero values! We'll come back to this later.
 
-3. Diastolic column
+3. <u>Diastolic column</u>
 ```
 SELECT 
   diastolic,
