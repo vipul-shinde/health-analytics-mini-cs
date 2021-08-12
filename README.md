@@ -261,7 +261,7 @@ It looks like whenever blood_pressure is measured, the systolic and diastolic co
 | blood_pressure | 128           | 128      | 77        |
 | blood_pressure | 114           | 114      | 76        |
 
-So, it looks like whenever blood_pressure is measured, measure_value is populated with systolic and sometimes it is = 0.
+So, it looks like whenever blood_pressure is measured, measure_value is populated with systolic and sometimes it is equal to 0.
 
 Let's check the same for the null values of systolic and diastolic.
 ```
