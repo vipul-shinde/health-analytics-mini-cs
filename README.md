@@ -34,3 +34,60 @@ FROM health.user_logs;
 | count |
 |-------|
 | 43891 |
+
+### 1.3 Unique column count
+We'll take a look at how many unique id's are present in the dataset. That'll give us a count of the total number of users.
+```
+SELECT COUNT(DISTINCT id)
+FROM health.user_logs;
+```
+*Output:*
+| count |
+|-------|
+| 554   |
+
+### 1.4 Single column frequency counts
+Let's take a look at the measure column and see frequency and the percentage count of each value across the table.
+```
+SELECT 
+  measure,
+  COUNT(*) AS frequency,
+  ROUND(
+  100* COUNT(*)::NUMERIC/SUM(COUNT(*)) OVER(),
+  2) AS percentage
+FROM health.user_logs
+GROUP BY measure
+ORDER BY frequency DESC;
+```
+*Output:*
+| measure        | frequency | percentage |
+|----------------|-----------|------------|
+| blood_glucose  | 38692     | 88.15      |
+| weight         | 2782      | 6.34       |
+| blood_pressure | 2417      | 5.51       |
+
+Let's also see the frequency of unique id's that appear in the dataset and limit the output to just 5.
+```
+SELECT 
+  id,
+  COUNT(*) AS frequency,
+  ROUND(
+  100* COUNT(*)::NUMERIC/SUM(COUNT(*)) OVER(),
+  2) AS percentage
+FROM health.user_logs
+GROUP BY id
+ORDER BY frequency DESC
+LIMIT 5;
+```
+*Output:*
+| id                                       | frequency | percentage |
+|------------------------------------------|-----------|------------|
+| 054250c692e07a9fa9e62e345231df4b54ff435d | 22325     | 50.86      |
+| 0f7b13f3f0512e6546b8d2c0d56e564a2408536a | 1589      | 3.62       |
+| ee653a96022cc3878e76d196b1667d95beca2db6 | 1235      | 2.81       |
+| abc634a555bbba7d6d6584171fdfa206ebf6c9a0 | 1212      | 2.76       |
+| 576fdb528e5004f733912fae3020e7d322dbc31a | 1018      | 2.32       |
+
+
+
+
