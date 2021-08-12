@@ -3,7 +3,7 @@
 ## 1. Exploratory Data Analysis
 
 ### 1.1 A look at the dataset
-Let's take a look at the first 10 rows from the `health.user_logs` table
+Let's take a look at the first 10 rows from the `health.user_logs` table.
 ```
 SELECT *
 FROM health.user_logs
@@ -22,3 +22,15 @@ LIMIT 10;
 | 87be2f14a5550389cb2cba03b3329c54c993f7d2 | 2020-10-12T00:00:00.000Z | weight         | 129.060012817 | 0        | 0         |
 | 0efe1f378aec122877e5f24f204ea70709b1f5f8 | 2020-10-07T00:00:00.000Z | blood_glucose  | 138           | 0        | 0         |
 | 054250c692e07a9fa9e62e345231df4b54ff435d | 2020-10-04T00:00:00.000Z | blood_glucose  | 210           | null     | null      |
+
+### 1.2 Total record count
+Let's also take a look at the total record count.
+```
+SELECT 
+  COUNT(*)
+FROM health.user_logs;
+```
+*Output:*
+| count |
+|-------|
+| 43891 |
