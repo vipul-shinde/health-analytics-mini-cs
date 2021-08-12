@@ -9,7 +9,7 @@ SELECT *
 FROM health.user_logs
 LIMIT 10;
 ```
-Output:
+*Output:*
 | id                                       | log_date                 | measure        | measure_value | systolic | diastolic |
 |------------------------------------------|--------------------------|----------------|---------------|----------|-----------|
 | fa28f948a740320ad56b81a24744c8b81df119fa | 2020-11-15T00:00:00.000Z | weight         | 46.03959      | null     | null      |
