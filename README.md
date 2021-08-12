@@ -9,6 +9,7 @@ SELECT *
 FROM health.user_logs
 LIMIT 10;
 ```
+
 *Output:*
 | id                                       | log_date                 | measure        | measure_value | systolic | diastolic |
 |------------------------------------------|--------------------------|----------------|---------------|----------|-----------|
@@ -30,6 +31,7 @@ SELECT
   COUNT(*)
 FROM health.user_logs;
 ```
+
 *Output:*
 | count |
 |-------|
@@ -41,6 +43,7 @@ We'll take a look at how many unique id's are present in the dataset. That'll gi
 SELECT COUNT(DISTINCT id)
 FROM health.user_logs;
 ```
+
 *Output:*
 | count |
 |-------|
@@ -59,6 +62,7 @@ FROM health.user_logs
 GROUP BY measure
 ORDER BY frequency DESC;
 ```
+
 *Output:*
 | measure        | frequency | percentage |
 |----------------|-----------|------------|
@@ -79,6 +83,7 @@ GROUP BY id
 ORDER BY frequency DESC
 LIMIT 5;
 ```
+
 *Output:*
 | id                                       | frequency | percentage |
 |------------------------------------------|-----------|------------|
@@ -101,6 +106,7 @@ GROUP BY measure_value
 ORDER BY frequency DESC
 LIMIT 10;
 ```
+
 *Output:*
 | measure_value | frequency |
 |---------------|-----------|
@@ -125,6 +131,7 @@ GROUP BY systolic
 ORDER BY frequency DESC
 LIMIT 10;
 ```
+
 *Output:*
 | systolic | frequency |
 |----------|-----------|
@@ -151,6 +158,7 @@ GROUP BY diastolic
 ORDER BY frequency DESC
 LIMIT 10;
 ```
+
 *Output:*
 | diastolic | frequency |
 |-----------|-----------|
@@ -179,6 +187,7 @@ WHERE measure_value = 0
 GROUP BY measure
 ORDER BY frequency DESC;
 ```
+
 *Output:*
 | measure        | frequency |
 |----------------|-----------|
@@ -198,6 +207,7 @@ FROM health.user_logs
 GROUP BY measure
 ORDER BY frequency DESC;
 ```
+
 *Output:*
 | measure        | frequency | percentage |
 |----------------|-----------|------------|
@@ -205,6 +215,88 @@ ORDER BY frequency DESC;
 | weight         | 2782      | 6.34       |
 | blood_pressure | 2417      | 5.51       |
 
+So, it looks like most of the time measure_value = 0 when measure is blood_pressure. Let's take a look what happens when measure_value=0 and measure = blood_pressure.
+```
+SELECT 
+  measure,
+  measure_value,
+  systolic,
+  diastolic
+FROM health.user_logs
+WHERE measure = 'blood_pressure'
+AND measure_value = 0
+LIMIT 10;
+```
 
+*Output:*
+| measure        | measure_value | systolic | diastolic |
+|----------------|---------------|----------|-----------|
+| blood_pressure | 0             | 115      | 76        |
+| blood_pressure | 0             | 115      | 76        |
+| blood_pressure | 0             | 105      | 70        |
+| blood_pressure | 0             | 136      | 87        |
+| blood_pressure | 0             | 164      | 84        |
+| blood_pressure | 0             | 190      | 94        |
+| blood_pressure | 0             | 125      | 79        |
+| blood_pressure | 0             | 136      | 84        |
+| blood_pressure | 0             | 135      | 89        |
+| blood_pressure | 0             | 138      | 85        |
+
+It looks like whenever blood_pressure is measured, the systolic and diastolic columns are populated but the measure_value is blank. Let's see what happens when the measure is blood_pressure but measure_value!=0.
+```
+
+```
+
+*Output:*
+| measure        | measure_value | systolic | diastolic |
+|----------------|---------------|----------|-----------|
+| blood_pressure | 140           | 140      | 113       |
+| blood_pressure | 114           | 114      | 80        |
+| blood_pressure | 132           | 132      | 94        |
+| blood_pressure | 105           | 105      | 68        |
+| blood_pressure | 149           | 149      | 85        |
+| blood_pressure | 156           | 156      | 88        |
+| blood_pressure | 142           | 142      | 84        |
+| blood_pressure | 131           | 131      | 71        |
+| blood_pressure | 128           | 128      | 77        |
+| blood_pressure | 114           | 114      | 76        |
+
+So, it looks like whenever blood_pressure is measured, measure_value is populated with systolic and sometimes it is = 0.
+
+Let's check the same for the null values of systolic and diastolic.
+```
+SELECT 
+  measure,
+  count(*)
+FROM health.user_logs
+WHERE systolic is NULL
+GROUP BY measure
+LIMIT 10;
+```
+
+*Output:*
+| measure       | count |
+|---------------|-------|
+| weight        | 443   |
+| blood_glucose | 25580 |
+
+This confirms that systolic only has non-null values when ``measure='blood_pressure'``. Is it the same for the diastolic column, let's see.
+```
+SELECT 
+  measure,
+  count(*)
+FROM health.user_logs
+WHERE diastolic is NULL
+GROUP BY measure
+LIMIT 10;
+```
+
+*Output:*
+| measure       | count |
+|---------------|-------|
+| weight        | 443   |
+| blood_glucose | 25580 |
+
+And, it's the same as systolic. Non-null values are only present when ``measure='blood_pressure'``.
 
 
