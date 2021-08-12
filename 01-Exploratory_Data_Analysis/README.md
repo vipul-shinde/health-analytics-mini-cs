@@ -1,5 +1,3 @@
-# Health Analytics Mini Case Study - Serious SQL
-
 ## 1. Exploratory Data Analysis
 
 ### 1.1 A look at the dataset
