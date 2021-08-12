@@ -165,5 +165,46 @@ LIMIT 10;
 | 83        | 106       |
 | 76        | 102       |
 
+This is somewhat similar output if compared to systolic column.
+
+### 1.6 Deep dive into the specific values
+
+So there are many 0 values in the measure_value column and some large number of nulls in systolic, diastolic. Let's take a look to see if the measure_value = 0 only when there is a specific measure value. We can use the WHERE clause here.
+```
+SELECT 
+  measure,
+  COUNT(*) AS frequency
+FROM health.user_logs
+WHERE measure_value = 0
+GROUP BY measure
+ORDER BY frequency DESC;
+```
+*Output:*
+| measure        | frequency |
+|----------------|-----------|
+| blood_pressure | 562       |
+| blood_glucose  | 8         |
+| weight         | 2         |
+
+And,
+```
+SELECT 
+  measure,
+  COUNT(*) AS frequency,
+  ROUND(
+  100* COUNT(*)::NUMERIC/SUM(COUNT(*)) OVER(),
+  2) AS percentage
+FROM health.user_logs
+GROUP BY measure
+ORDER BY frequency DESC;
+```
+*Output:*
+| measure        | frequency | percentage |
+|----------------|-----------|------------|
+| blood_glucose  | 38692     | 88.15      |
+| weight         | 2782      | 6.34       |
+| blood_pressure | 2417      | 5.51       |
+
+
 
 
