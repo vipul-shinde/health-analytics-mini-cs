@@ -2,7 +2,7 @@
 
 ### 1.1 A look at the dataset
 Let's take a look at the first 10 rows from the `health.user_logs` table.
-```
+```sql
 SELECT *
 FROM health.user_logs
 LIMIT 10;
@@ -24,7 +24,7 @@ LIMIT 10;
 
 ### 1.2 Total record count
 Let's also take a look at the total record count.
-```
+```sql
 SELECT 
   COUNT(*)
 FROM health.user_logs;
@@ -37,7 +37,7 @@ FROM health.user_logs;
 
 ### 1.3 Unique column count
 We'll take a look at how many unique id's are present in the dataset. That'll give us a count of the total number of users.
-```
+```sql
 SELECT COUNT(DISTINCT id)
 FROM health.user_logs;
 ```
@@ -49,7 +49,7 @@ FROM health.user_logs;
 
 ### 1.4 Single column frequency counts
 Let's take a look at the measure column and see frequency and the percentage count of each value across the table.
-```
+```sql
 SELECT 
   measure,
   COUNT(*) AS frequency,
@@ -69,7 +69,7 @@ ORDER BY frequency DESC;
 | blood_pressure | 2417      | 5.51       |
 
 Let's also see the frequency of unique id's that appear in the dataset and limit the output to just 5.
-```
+```sql
 SELECT 
   id,
   COUNT(*) AS frequency,
@@ -95,7 +95,7 @@ LIMIT 5;
 Let's now take a look at the most frequent values accross each column.
 
 1. <u>Measure Value Column</u>
-```
+```sql
 SELECT 
   measure_value,
   COUNT(*) AS frequency
@@ -120,7 +120,7 @@ LIMIT 10;
 | 115           | 319       |
 
 2. <u>Systolic column</u>
-```
+```sql
 SELECT 
   systolic,
   COUNT(*) AS frequency
@@ -147,7 +147,7 @@ LIMIT 10;
 Wow. So many null and zero values! We'll come back to this later.
 
 3. <u>Diastolic column</u>
-```
+```sql
 SELECT 
   diastolic,
   COUNT(*) AS frequency
@@ -176,7 +176,7 @@ This is somewhat similar output if compared to systolic column.
 ### 1.6 Deep dive into the specific values
 
 So there are many 0 values in the measure_value column and some large number of nulls in systolic, diastolic. Let's take a look to see if the measure_value = 0 only when there is a specific measure value. We can use the WHERE clause here.
-```
+```sql
 SELECT 
   measure,
   COUNT(*) AS frequency
@@ -194,7 +194,7 @@ ORDER BY frequency DESC;
 | weight         | 2         |
 
 And,
-```
+```sql
 SELECT 
   measure,
   COUNT(*) AS frequency,
@@ -214,7 +214,7 @@ ORDER BY frequency DESC;
 | blood_pressure | 2417      | 5.51       |
 
 So, it looks like most of the time measure_value = 0 when measure is blood_pressure. Let's take a look what happens when measure_value=0 and measure = blood_pressure.
-```
+```sql
 SELECT 
   measure,
   measure_value,
@@ -241,8 +241,16 @@ LIMIT 10;
 | blood_pressure | 0             | 138      | 85        |
 
 It looks like whenever blood_pressure is measured, the systolic and diastolic columns are populated but the measure_value is blank. Let's see what happens when the measure is blood_pressure but measure_value!=0.
-```
-
+```sql
+SELECT 
+  measure,
+  measure_value,
+  systolic,
+  diastolic
+FROM health.user_logs
+WHERE measure = 'blood_pressure'
+AND measure_value is NOT NULL
+LIMIT 10;
 ```
 
 *Output:*
@@ -262,7 +270,7 @@ It looks like whenever blood_pressure is measured, the systolic and diastolic co
 So, it looks like whenever blood_pressure is measured, measure_value is populated with systolic and sometimes it is equal to 0.
 
 Let's check the same for the null values of systolic and diastolic.
-```
+```sql
 SELECT 
   measure,
   count(*)
@@ -279,7 +287,7 @@ LIMIT 10;
 | blood_glucose | 25580 |
 
 This confirms that systolic only has non-null values when ``measure='blood_pressure'``. Is it the same for the diastolic column, let's see.
-```
+```sql
 SELECT 
   measure,
   count(*)
