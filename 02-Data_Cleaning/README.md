@@ -1,6 +1,6 @@
-## 2. Data Preparation and Cleaning
+# 2. Data Preparation and Cleaning
 
-### 2.1 Checking for duplicate values
+## 2.1 Checking for duplicate values
 First, let's take a look at the total count of rows in the dataset.
 ```sql
 SELECT 
