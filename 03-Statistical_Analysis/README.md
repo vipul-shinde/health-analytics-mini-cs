@@ -259,3 +259,61 @@ LIMIT 10;
 | 185.51913     | 8                | 8          | 7                |
 | 175.086512    | 9                | 9          | 8                |
 | 173.725736    | 10               | 10         | 9                |
+
+## 3.6 Large Outliers
+
+| measure_value | row_number_order | rank_order | dense_rank_order |
+|---------------|------------------|------------|------------------|
+| 39642120      | 1                | 1          | 1                |
+| 39642120      | 2                | 1          | 1                |
+| 576484        | 3                | 3          | 2                |
+| 200.487664    | 4                | 4          | 3                |
+
+Here, if we take a look at the top 4 values. We can see values like 39642120 kg, 39642120 kg, .., 200 kg which seems unreal for a person to have. Maybe 200 kg is fine but the others are definitely outliers and we should remove them.
+
+## 3.7 Small Outliers
+
+We shall also look for any outliers in the 1st %tile if there are any as they could also skew our analysis.
+```sql
+WITH percentile_values AS (
+  SELECT 
+    measure_value,
+    NTILE(100) OVER (
+      ORDER BY measure_value
+    ) AS percentile
+  FROM health.user_logs
+  WHERE measure='weight'
+)
+
+SELECT 
+  measure_value,
+  ROW_NUMBER() OVER (ORDER BY measure_value) AS row_number_order,
+  RANK() OVER (ORDER BY measure_value) AS rank_order,
+  DENSE_RANK() OVER (ORDER BY measure_value) AS dense_rank_order
+FROM percentile_values
+WHERE percentile = 1
+ORDER BY measure_value
+LIMIT 10;
+```
+
+*Output:*
+
+| measure_value | row_number_order | rank_order | dense_rank_order |
+|---------------|------------------|------------|------------------|
+| 0             | 1                | 1          | 1                |
+| 0             | 2                | 1          | 1                |
+| 1.814368      | 3                | 3          | 2                |
+| 2.26796       | 4                | 4          | 3                |
+| 2.26796       | 5                | 4          | 3                |
+| 8             | 6                | 6          | 4                |
+| 10.432616     | 7                | 7          | 5                |
+| 11.3398       | 8                | 8          | 6                |
+| 12.700576     | 9                | 9          | 7                |
+| 15.422128     | 10               | 10         | 8                |
+
+There are a few 0 values which also seems unreal for a person to have that measure as a weight. We shall remove that as well.
+
+
+
+
+
