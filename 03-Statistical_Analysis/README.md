@@ -149,5 +149,77 @@ WHERE measure = 'weight';
 |---------|-----------|-------------|------------|--------------|------------|------------------|------------|
 | weight  | 0.00      | 39642120.00 | 28786.85   | 75.98        | 68.49      | 1129457862383.41 | 1062759.55 |
 
+## 3.5 Cumulative Distribution Function
+CDF takes up a value and returns the percentile in which the value belongs to. Let's query the CDF of all values in measure_value when ```measure='weight```. We'll limit the output to 10 rows.
+```sql
+SELECT
+  measure_value,
+  NTILE(100) OVER (ORDER BY measure_value) AS percentile
+FROM health.user_logs
+WHERE measure = 'weight'
+ORDER BY percentile
+LIMIT 10;
+```
 
+*Output:*
+
+| measure_value | percentile |
+|---------------|------------|
+| 0             | 1          |
+| 1.814368      | 1          |
+| 2.26796       | 1          |
+| 2.26796       | 1          |
+| 8             | 1          |
+| 10.432616     | 1          |
+| 11.3398       | 1          |
+| 12.700576     | 1          |
+| 15.422128     | 1          |
+| 0             | 1          |
+
+Now, we can find out the floor and ceiling value (i.e. max and min value) within each bucket or percentile and also the total number of values present in that particular bucket. Ideally, since we are calculating 100 buckets each bucket should contain 1% of the total data.
+```sql
+WITH percentile_values AS (
+  SELECT
+    measure_value,
+    NTILE(100) OVER (ORDER BY measure_value) AS percentile
+  FROM health.user_logs
+  WHERE measure = 'weight'
+  ORDER BY percentile
+)
+
+SELECT
+  percentile,
+  MIN(measure_value) AS floor_value,
+  MAX(measure_value) AS ceiling_value,
+  COUNT(*) AS percentile_count
+FROM percentile_values
+GROUP BY percentile
+ORDER BY percentile;
+```
+
+*Output:*
+
+| percentile | floor_value   | ceiling_value | percentile_count |
+|------------|---------------|---------------|------------------|
+| 1          | 0             | 29.029888     | 28               |
+| 2          | 29.48348      | 32.0689544    | 28               |
+| 3          | 32.205032     | 35.380177     | 28               |
+| 4          | 35.380177     | 36.74095      | 28               |
+| 5          | 36.74095      | 37.194546     | 28               |
+| ...        |  ...          |   ...         |    ...           |
+| 95         | 129.86485     | 130.542007446 | 27               |
+| 96         | 130.54207     | 131.570999146 | 27               |
+| 97         | 131.670013428 | 132.776       | 27               |
+| 98         | 132.776000977 | 133.832000732 | 27               |
+| 99         | 133.89095     | 136.531192    | 27               |
+| 100        | 136.531192    | 39642120      | 27               |
+
+If we look at the above output. Let's just take a look at 1st and 100th percentile.
+
+| percentile | floor_value   | ceiling_value | percentile_count |
+|------------|---------------|---------------|------------------|
+| 1          | 0             | 29.029888     | 28               |
+| 100        | 136.531192    | 39642120      | 27               |
+
+The ceiling_value of 1st percentile is 29.02 i.e. 29kg maybe, and the floor_value of 100th percentile is 136kg but ceiling is 3964210 kg?? Sounds abnormal. Maybe there was an incorrect measurement input fro few of the patient logs from the 100th %tile. Let's dive further into the 100th %tile to investigate more on this.
 
