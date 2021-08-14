@@ -223,3 +223,39 @@ If we look at the above output. Let's just take a look at 1st and 100th percenti
 
 The ceiling_value of 1st percentile is 29.02 i.e. 29kg maybe, and the floor_value of 100th percentile is 136kg but ceiling is 3964210 kg?? Sounds abnormal. Maybe there was an incorrect measurement input fro few of the patient logs from the 100th %tile. Let's dive further into the 100th %tile to investigate more on this.
 
+```sql
+WITH percentile_values AS (
+  SELECT 
+    measure_value,
+    NTILE(100) OVER (
+      ORDER BY measure_value
+    ) AS percentile
+  FROM health.user_logs
+  WHERE measure='weight'
+)
+
+SELECT 
+  measure_value,
+  ROW_NUMBER() OVER (ORDER BY measure_value DESC) AS row_number_order,
+  RANK() OVER (ORDER BY measure_value DESC) AS rank_order,
+  DENSE_RANK() OVER (ORDER BY measure_value DESC) AS dense_rank_order
+FROM percentile_values
+WHERE percentile = 100
+ORDER BY measure_value DESC
+LIMIT 10;
+```
+
+*Output:*
+
+| measure_value | row_number_order | rank_order | dense_rank_order |
+|---------------|------------------|------------|------------------|
+| 39642120      | 1                | 1          | 1                |
+| 39642120      | 2                | 1          | 1                |
+| 576484        | 3                | 3          | 2                |
+| 200.487664    | 4                | 4          | 3                |
+| 190.4         | 5                | 5          | 4                |
+| 188.69427     | 6                | 6          | 5                |
+| 186.8799      | 7                | 7          | 6                |
+| 185.51913     | 8                | 8          | 7                |
+| 175.086512    | 9                | 9          | 8                |
+| 173.725736    | 10               | 10         | 9                |
