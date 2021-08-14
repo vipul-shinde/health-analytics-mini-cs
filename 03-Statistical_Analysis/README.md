@@ -72,3 +72,82 @@ WHERE measure = 'weight';
 | 28786.846657295953 | 75.976721975 | 68.49244787 |
 
 Looks like there are outliers in the dataset within the measure_value column when ```measure='weights'```.
+
+## 3.3 Spread of the Data
+
+Let's see how the data is spread across the measure_value column and the measure is equal to weight. 
+
+### 3.3.1 Min, Max, Range values
+
+```sql
+WITH min_max_values AS (
+  SELECT
+    MIN(measure_value) AS min_value,
+    MAX(measure_value) AS max_value
+  FROM health.user_logs
+  WHERE measure = 'weight'
+)
+
+SELECT
+  min_value,
+  max_value,
+  max_value - min_value AS range_value
+FROM min_max_values;
+```
+
+*Output:*
+
+| min_value | max_value | range_value |
+|-----------|-----------|-------------|
+| 0         | 39642120  | 39642120    |
+
+### 3.3.2 Variance & Standard Deviation
+
+The variance and standard deviation will give us a more clear idea about the spread of data as compared to just min, max values.
+
+```sql
+SELECT
+  VARIANCE(measure_value) AS var_value,
+  STDDEV(measure_value) AS std_value
+FROM health.user_logs
+WHERE measure = 'weight';
+```
+
+*Output:*
+
+| var_value                        | std_value                  |
+|----------------------------------|----------------------------|
+| 1129457862383.414293789530531301 | 1062759.550596189323085400 |
+
+## 3.4 Statistical Summary
+
+Let's query all the stats values again but this time let's round of the data by 2 decimals.
+
+```sql
+SELECT
+  'weight' as measure,
+  ROUND(MIN(measure_value), 2) AS min_value,
+  ROUND(MAX(measure_value), 2) AS max_value,
+  ROUND(AVG(measure_value), 2) AS mean_value,
+  ROUND(
+    CAST(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY measure_value) AS NUMERIC),
+    2
+  ) AS median_value,
+  ROUND(
+    MODE() WITHIN GROUP (ORDER BY measure_value),
+    2
+  ) AS mode_value,
+  ROUND(VARIANCE(measure_value), 2) AS var_value,
+  ROUND(STDDEV(measure_value), 2) AS std_value
+FROM health.user_logs
+WHERE measure = 'weight';
+```
+
+*Output:*
+
+| measure | min_value | max_value   | mean_value | median_value | mode_value | var_value        | std_value  |
+|---------|-----------|-------------|------------|--------------|------------|------------------|------------|
+| weight  | 0.00      | 39642120.00 | 28786.85   | 75.98        | 68.49      | 1129457862383.41 | 1062759.55 |
+
+
+
