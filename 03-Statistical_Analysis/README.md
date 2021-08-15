@@ -313,6 +313,93 @@ LIMIT 10;
 
 There are a few 0 values which also seems unreal for a person to have that measure as a weight. We shall remove that as well.
 
+## 3.8 Removing Outlier
+
+Here, we'll create a new temporary table and remove our outliers.
+```sql
+DROP TABLE IF EXISTS clean_weight_logs;
+CREATE TEMP TABLE clean_weight_logs AS (
+  SELECT *
+  FROM health.user_logs
+  WHERE measure = 'weight'
+    AND measure_value > 0
+    AND measure_value < 201
+);
+```
+
+*Output:*
+
+None
+
+Now, let's run all the statistical analysis on this new temp dataset without the outliers.
+```sql
+SELECT
+  ROUND(MIN(measure_value), 2) AS minimum_value,
+  ROUND(MAX(measure_value), 2) AS maximum_value,
+  ROUND(AVG(measure_value), 2) AS mean_value,
+  ROUND(
+    CAST(PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY measure_value) AS NUMERIC),
+    2
+  ) AS median_value,
+  ROUND(
+    MODE() WITHIN GROUP (ORDER BY measure_value),
+    2
+  ) AS mode_value,
+  ROUND(STDDEV(measure_value), 2) AS standard_deviation,
+  ROUND(VARIANCE(measure_value), 2) AS variance_value
+FROM clean_weight_logs;
+```
+
+*Output:*
+
+| minimum_value | maximum_value | mean_value | median_value | mode_value | standard_deviation | variance_value |
+|---------------|---------------|------------|--------------|------------|--------------------|----------------|
+| 1.81          | 200.49        | 80.76      | 75.98        | 68.49      | 26.91              | 724.29         |
+
+
+Now the stats look somewhat normal as they don't have any huge or odd values. Also, let's take a look at the Cumulative Distribution Function for our new weight dataset.
+
+```sql
+WITH percentile_values AS (
+  SELECT
+    measure_value,
+    NTILE(100) OVER (
+      ORDER BY
+        measure_value
+    ) AS percentile
+  FROM clean_weight_logs
+)
+SELECT
+  percentile,
+  MIN(measure_value) AS floor_value,
+  MAX(measure_value) AS ceiling_value,
+  COUNT(*) AS percentile_counts
+FROM percentile_values
+GROUP BY percentile
+ORDER BY percentile;
+```
+
+*Output:*
+
+| percentile | floor_value | ceiling_value | percentile_counts |
+|------------|-------------|---------------|-------------------|
+| 1          | 1.814368    | 29.48348      | 28                |
+| 2          | 29.48348    | 32.4771872    | 28                |
+| 3          | 32.658623   | 35.380177     | 28                |
+| 4          | 35.380177   | 36.74095      | 28                |
+| 5          | 36.74095    | 37.194546     | 28                |
+| ...        |  ...        |   ...         |    ...            |
+| 95         | 129.77278   | 130.52802     | 27                |
+| 96         | 130.5389    | 131.54168     | 27                |
+| 97         | 131.54169   | 132.6599      | 27                |
+| 98         | 132.736     | 133.765       | 27                |
+| 99         | 133.80965   | 136.0776      | 27                |
+| 100        | 136.0776    | 200.487664    | 27                |
+
+
+
+
+
 
 
 
