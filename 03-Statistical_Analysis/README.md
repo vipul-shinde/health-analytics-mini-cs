@@ -426,10 +426,10 @@ LIMIT 10;
 | 10     | 37.9527840350000000 | 120       |
 | 11     | 41.5446259242424242 | 66        |
 
-**Histogram Plot**
+**Histogram Plot:**
 
-![Histogram](health-analytics-mini-cs\Images\histogram.png)
+![Histogram](..\Images\histogram.png)
 
-
+Looks like there are large number of patients with weight in between 60-80 kg/lb. 
 
 
