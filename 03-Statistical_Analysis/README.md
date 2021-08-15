@@ -397,9 +397,38 @@ ORDER BY percentile;
 | 100        | 136.0776    | 200.487664    | 27                |
 
 
+## 3.9 Frequency Distribution
 
+Let's finally also plot a histogram to see the distribution of values in a visual graph. We use the ```WIDTH_BUCKET``` function to break down into n number of buckets. 
+```sql
+SELECT
+  WIDTH_BUCKET(measure_value, 0, 200, 50) AS bucket,
+  AVG(measure_value) AS measure_value,
+  COUNT(*) AS frequency
+FROM clean_weight_logs
+GROUP BY bucket
+ORDER BY bucket
+LIMIT 10;
+```
 
+*Output:*
 
+| bucket | measure_value       | frequency |
+|--------|---------------------|-----------|
+| 1      | 2.1167626666666667  | 3         |
+| 3      | 9.9241386666666667  | 3         |
+| 4      | 14.0613520000000000 | 2         |
+| 5      | 18.1436800000000000 | 1         |
+| 6      | 22.2260080000000000 | 2         |
+| 7      | 26.6485300000000000 | 8         |
+| 8      | 30.5550911625000000 | 32        |
+| 9      | 34.4161344213953488 | 43        |
+| 10     | 37.9527840350000000 | 120       |
+| 11     | 41.5446259242424242 | 66        |
+
+**Histogram Plot**
+
+![Histogram](health-analytics-mini-cs\Images\histogram.png)
 
 
 
