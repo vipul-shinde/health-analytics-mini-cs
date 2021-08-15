@@ -428,7 +428,7 @@ LIMIT 10;
 
 **Histogram Plot:**
 
-![Histogram](..\Images\histogram.png)
+![Histogram](../Images/histogram.png)
 
 Looks like there are large number of patients with weight in between 60-80 kg/lb. 
 
