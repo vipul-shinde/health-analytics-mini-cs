@@ -65,7 +65,7 @@ None
 Let's take a look at the newly created TEMP table with distinct values only.
 ```sql
 SELECT * 
-FROM pg_temp_3.deduplicated_user_logs
+FROM deduplicated_user_logs
 LIMIT 5;
 ```
 
@@ -81,7 +81,7 @@ LIMIT 5;
 The total count of values in the table:
 ```sql
 SELECT COUNT(*) 
-FROM pg_temp_3.deduplicated_user_logs;
+FROM deduplicated_user_logs;
 ```
 
 *Output:*
