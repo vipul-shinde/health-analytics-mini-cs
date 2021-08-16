@@ -65,7 +65,9 @@ FROM user_measure_count;
 |------------------------------|
 | 2.00                         |
 
-### 4.4
+The median number of measurements per user is 2.
+
+### 4.4 How many users have 3 or more measurements?
 ```sql
 SELECT
   COUNT(*) AS total
@@ -78,6 +80,8 @@ WHERE measure_count >= 3;
 | total |
 |-------|
 | 209   |
+
+Total number of users having 3 or more measurements is 209.
 
 ### 4.5 How many users have 1,000 or more measurements?
 ```sql
@@ -93,6 +97,8 @@ WHERE measure_count >= 1000;
 |-------|
 | 5     |
 
+Total number of users having 1000 or more measurements is 5.
+
 ### 4.6 Have logged blood glucose measurements?
 ```sql
 SELECT 
@@ -107,6 +113,7 @@ WHERE measure = 'blood_glucose';
 |-------|
 | 325   |
 
+The number of users having blood_glucose as a logged measurement is 325.
 
 ### 4.7 Have at least 2 types of measurements?
 ```sql
@@ -122,6 +129,8 @@ WHERE unique_measures >= 2;
 |-------------|
 | 204         |
 
+There are 204 users having atleast 2 types of measurements.
+
 ### 4.8 Have all 3 measures - blood glucose, weight and blood pressure?
 ```sql
 SELECT 
@@ -135,6 +144,8 @@ WHERE unique_measures = 3;
 | total_count |
 |-------------|
 | 50          |
+
+Total numbers of users having all 3 measures as their logged measurement is 50.
 
 ### 4.9 What is the median systolic/diastolic blood pressure values?
 ```sql
@@ -150,5 +161,7 @@ WHERE measure = 'blood_pressure';
 | systolic_median | diastolic_median |
 |-----------------|------------------|
 | 126             | 79               |
+
+The median systolic/diastolic blood pressure value is 126/79.
 
 # Thank you!
