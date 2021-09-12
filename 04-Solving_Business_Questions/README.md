@@ -4,7 +4,7 @@ We’ve just received an urgent request from the General Manager of Analytics at
 
 The Health Co analytics team have shared with us a few questions that they want answers to. Let's use SQL to solve the business questions one by one.
 
-### 4.1 How many unique users exist in the logs dataset?
+## 4.1 How many unique users exist in the logs dataset?
 
 ```sql
 SELECT 
@@ -21,6 +21,7 @@ FROM health.user_logs;
 So in total, there are 554 unique users in the dataset.
 
 *For questions 2-8 we have created a temp table*
+
 ```sql
 DROP TABLE IF EXISTS user_measure_count;
 CREATE TEMP TABLE user_measure_count AS
@@ -32,7 +33,7 @@ FROM health.user_logs
 GROUP BY 1;
 ```
 
-### 4.2 How many total measurements do we have per user on average?
+## 4.2 How many total measurements do we have per user on average?
 
 ```sql
 SELECT
@@ -48,7 +49,7 @@ FROM user_measure_count;
 
 The average number of measurements per user is 79.
 
-### 4.3 What about the median number of measurements per user?
+## 4.3 What about the median number of measurements per user?
 
 ```sql
 SELECT
@@ -67,7 +68,8 @@ FROM user_measure_count;
 
 The median number of measurements per user is 2.
 
-### 4.4 How many users have 3 or more measurements?
+## 4.4 How many users have 3 or more measurements?
+
 ```sql
 SELECT
   COUNT(*) AS total
@@ -83,7 +85,8 @@ WHERE measure_count >= 3;
 
 Total number of users having 3 or more measurements is 209.
 
-### 4.5 How many users have 1,000 or more measurements?
+## 4.5 How many users have 1,000 or more measurements?
+
 ```sql
 SELECT
   COUNT(*) AS total
@@ -99,7 +102,8 @@ WHERE measure_count >= 1000;
 
 Total number of users having 1000 or more measurements is 5.
 
-### 4.6 Have logged blood glucose measurements?
+## 4.6 Have logged blood glucose measurements?
+
 ```sql
 SELECT 
   COUNT (DISTINCT id)
@@ -115,7 +119,8 @@ WHERE measure = 'blood_glucose';
 
 The number of users having blood_glucose as a logged measurement is 325.
 
-### 4.7 Have at least 2 types of measurements?
+## 4.7 Have at least 2 types of measurements?
+
 ```sql
 SELECT 
   SUM(COUNT (*)) OVER() AS total_count
@@ -129,9 +134,10 @@ WHERE unique_measures >= 2;
 |-------------|
 | 204         |
 
-There are 204 users having atleast 2 types of measurements.
+There are 204 users having at least 2 types of measurements.
 
-### 4.8 Have all 3 measures - blood glucose, weight and blood pressure?
+## 4.8 Have all 3 measures - blood glucose, weight and blood pressure?
+
 ```sql
 SELECT 
   SUM(COUNT (*)) OVER() AS total_count
@@ -147,7 +153,8 @@ WHERE unique_measures = 3;
 
 Total numbers of users having all 3 measures as their logged measurement is 50.
 
-### 4.9 What is the median systolic/diastolic blood pressure values?
+## 4.9 What is the median systolic/diastolic blood pressure values?
+
 ```sql
 SELECT 
   PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY systolic) AS systolic_median,
