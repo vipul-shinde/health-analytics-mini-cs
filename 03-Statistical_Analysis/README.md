@@ -1,7 +1,9 @@
 # 3. Statistical Analysis and Distribution Functions
 
 ## 3.1 Arithmetic Mean or Average
+
 Let's take a look at the average of the ```median_value``` column.
+
 ```sql
 SELECT
   AVG(measure_value)
@@ -16,6 +18,7 @@ FROM health.user_logs;
 
 
 Whoa! That's a huge number. Let's go further into this. Let's see our measures again.
+
 ```sql
 SELECT
   measure,
@@ -33,6 +36,7 @@ GROUP BY measure;
 | weight         | 2782   |
 
 Also, let's see the average measure_value based grouped by the measure column.
+
 ```sql
 SELECT
   measure,
@@ -56,6 +60,7 @@ Something is wrong here. The weight average of a person is ```28786```. Let's co
 ## 3.2 Median & Mode
 
 Let's also calculate the median & mode for the weight column and see why is this happening.
+
 ```sql
 SELECT
   AVG(measure_value) as mean,
@@ -150,7 +155,9 @@ WHERE measure = 'weight';
 | weight  | 0.00      | 39642120.00 | 28786.85   | 75.98        | 68.49      | 1129457862383.41 | 1062759.55 |
 
 ## 3.5 Cumulative Distribution Function
+
 CDF takes up a value and returns the percentile in which the value belongs to. Let's query the CDF of all values in measure_value when ```measure='weight```. We'll limit the output to 10 rows.
+
 ```sql
 SELECT
   measure_value,
@@ -177,6 +184,7 @@ LIMIT 10;
 | 0             | 1          |
 
 Now, we can find out the floor and ceiling value (i.e. max and min value) within each bucket or percentile and also the total number of values present in that particular bucket. Ideally, since we are calculating 100 buckets each bucket should contain 1% of the total data.
+
 ```sql
 WITH percentile_values AS (
   SELECT
@@ -274,6 +282,7 @@ Here, if we take a look at the top 4 values. We can see values like 39642120 kg,
 ## 3.7 Small Outliers
 
 We shall also look for any outliers in the 1st %tile if there are any as they could also skew our analysis.
+
 ```sql
 WITH percentile_values AS (
   SELECT 
@@ -316,6 +325,7 @@ There are a few 0 values which also seems unreal for a person to have that measu
 ## 3.8 Removing Outlier
 
 Here, we'll create a new temporary table and remove our outliers.
+
 ```sql
 DROP TABLE IF EXISTS clean_weight_logs;
 CREATE TEMP TABLE clean_weight_logs AS (
@@ -332,6 +342,7 @@ CREATE TEMP TABLE clean_weight_logs AS (
 None
 
 Now, let's run all the statistical analysis on this new temp dataset without the outliers.
+
 ```sql
 SELECT
   ROUND(MIN(measure_value), 2) AS minimum_value,
@@ -355,7 +366,6 @@ FROM clean_weight_logs;
 | minimum_value | maximum_value | mean_value | median_value | mode_value | standard_deviation | variance_value |
 |---------------|---------------|------------|--------------|------------|--------------------|----------------|
 | 1.81          | 200.49        | 80.76      | 75.98        | 68.49      | 26.91              | 724.29         |
-
 
 Now the stats look somewhat normal as they don't have any huge or odd values. Also, let's take a look at the Cumulative Distribution Function for our new weight dataset.
 
@@ -396,10 +406,10 @@ ORDER BY percentile;
 | 99         | 133.80965   | 136.0776      | 27                |
 | 100        | 136.0776    | 200.487664    | 27                |
 
-
 ## 3.9 Frequency Distribution
 
-Let's finally also plot a histogram to see the distribution of values in a visual graph. We use the ```WIDTH_BUCKET``` function to break down into n number of buckets. 
+Let's finally also plot a histogram to see the distribution of values in a visual graph. We use the ```WIDTH_BUCKET``` function to break down into n number of buckets.
+
 ```sql
 SELECT
   WIDTH_BUCKET(measure_value, 0, 200, 50) AS bucket,
@@ -430,6 +440,4 @@ LIMIT 10;
 
 ![Histogram](../Images/histogram.png)
 
-Looks like there are large number of patients with weight in between 60-80 kg/lb. 
-
-
+Looks like there are large number of patients with weight in between 60-80 kg/lb.

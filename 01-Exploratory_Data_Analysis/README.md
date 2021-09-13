@@ -1,7 +1,9 @@
-## 1. Exploratory Data Analysis
+# 1. Exploratory Data Analysis
 
-### 1.1 A look at the dataset
+## 1.1 A look at the dataset
+
 Let's take a look at the first 10 rows from the `health.user_logs` table.
+
 ```sql
 SELECT *
 FROM health.user_logs
@@ -22,8 +24,10 @@ LIMIT 10;
 | 0efe1f378aec122877e5f24f204ea70709b1f5f8 | 2020-10-07T00:00:00.000Z | blood_glucose  | 138           | 0        | 0         |
 | 054250c692e07a9fa9e62e345231df4b54ff435d | 2020-10-04T00:00:00.000Z | blood_glucose  | 210           | null     | null      |
 
-### 1.2 Total record count
+## 1.2 Total record count
+
 Let's also take a look at the total record count.
+
 ```sql
 SELECT 
   COUNT(*)
@@ -35,8 +39,10 @@ FROM health.user_logs;
 |-------|
 | 43891 |
 
-### 1.3 Unique column count
+## 1.3 Unique column count
+
 We'll take a look at how many unique id's are present in the dataset. That'll give us a count of the total number of users.
+
 ```sql
 SELECT COUNT(DISTINCT id)
 FROM health.user_logs;
@@ -47,8 +53,10 @@ FROM health.user_logs;
 |-------|
 | 554   |
 
-### 1.4 Single column frequency counts
+## 1.4 Single column frequency counts
+
 Let's take a look at the measure column and see frequency and the percentage count of each value across the table.
+
 ```sql
 SELECT 
   measure,
@@ -69,6 +77,7 @@ ORDER BY frequency DESC;
 | blood_pressure | 2417      | 5.51       |
 
 Let's also see the frequency of unique id's that appear in the dataset and limit the output to just 5.
+
 ```sql
 SELECT 
   id,
@@ -91,10 +100,12 @@ LIMIT 5;
 | abc634a555bbba7d6d6584171fdfa206ebf6c9a0 | 1212      | 2.76       |
 | 576fdb528e5004f733912fae3020e7d322dbc31a | 1018      | 2.32       |
 
-### 1.5 Individual column distribution
-Let's now take a look at the most frequent values accross each column.
+## 1.5 Individual column distribution
+
+Let's now take a look at the most frequent values across each column.
 
 1. <u>Measure Value Column</u>
+
 ```sql
 SELECT 
   measure_value,
@@ -120,6 +131,7 @@ LIMIT 10;
 | 115           | 319       |
 
 2. <u>Systolic column</u>
+
 ```sql
 SELECT 
   systolic,
@@ -147,6 +159,7 @@ LIMIT 10;
 Wow. So many null and zero values! We'll come back to this later.
 
 3. <u>Diastolic column</u>
+
 ```sql
 SELECT 
   diastolic,
@@ -173,9 +186,10 @@ LIMIT 10;
 
 This is somewhat similar output if compared to systolic column.
 
-### 1.6 Deep dive into the specific values
+## 1.6 Deep dive into the specific values
 
 So there are many 0 values in the measure_value column and some large number of nulls in systolic, diastolic. Let's take a look to see if the measure_value = 0 only when there is a specific measure value. We can use the WHERE clause here.
+
 ```sql
 SELECT 
   measure,
@@ -194,6 +208,7 @@ ORDER BY frequency DESC;
 | weight         | 2         |
 
 And,
+
 ```sql
 SELECT 
   measure,
@@ -214,6 +229,7 @@ ORDER BY frequency DESC;
 | blood_pressure | 2417      | 5.51       |
 
 So, it looks like most of the time measure_value = 0 when measure is blood_pressure. Let's take a look what happens when measure_value=0 and measure = blood_pressure.
+
 ```sql
 SELECT 
   measure,
@@ -241,6 +257,7 @@ LIMIT 10;
 | blood_pressure | 0             | 138      | 85        |
 
 It looks like whenever blood_pressure is measured, the systolic and diastolic columns are populated but the measure_value is blank. Let's see what happens when the measure is blood_pressure but measure_value!=0.
+
 ```sql
 SELECT 
   measure,
@@ -270,6 +287,7 @@ LIMIT 10;
 So, it looks like whenever blood_pressure is measured, measure_value is populated with systolic and sometimes it is equal to 0.
 
 Let's check the same for the null values of systolic and diastolic.
+
 ```sql
 SELECT 
   measure,
@@ -287,6 +305,7 @@ LIMIT 10;
 | blood_glucose | 25580 |
 
 This confirms that systolic only has non-null values when ``measure='blood_pressure'``. Is it the same for the diastolic column, let's see.
+
 ```sql
 SELECT 
   measure,
@@ -304,5 +323,3 @@ LIMIT 10;
 | blood_glucose | 25580 |
 
 And, it's the same as systolic. Non-null values are only present when ``measure='blood_pressure'``.
-
-

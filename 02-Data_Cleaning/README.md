@@ -1,7 +1,9 @@
 # 2. Data Preparation and Cleaning
 
 ## 2.1 Checking for duplicate values
+
 First, let's take a look at the total count of rows in the dataset.
+
 ```sql
 SELECT 
   COUNT(*)
@@ -16,7 +18,9 @@ FROM health.user_logs;
 Now, let's check for distinct number of values in the dataset. There are three different ways we could do that:
 
 ### 2.1.1 Subquery
-A subquery is essentially a query within a query. Here we get an output from querying on the inner query. 
+
+A subquery is essentially a query within a query. Here we get an output from querying on the inner query.
+
 ```sql
 SELECT COUNT(*)
 FROM (
@@ -32,6 +36,7 @@ FROM (
 | 31004 |
 
 ### 2.1.2 Common Table Expression
+
 ```sql
 WITH deduped_logs AS (
   SELECT DISTINCT *
@@ -47,11 +52,13 @@ FROM deduped_logs;
 | 31004 |
 
 ### 2.1.3 Temporary Tables
+
 A temporary table will help you minimize the number of time you'll have to use the DISTINCT command everytime you want to query from the table without any duplicate values.
 
 But, before creating a temp table, you should run a drop table query to clear any previously created tables. This helps us create a clean table and if there's any table with the same name, it'll clear it.
 
 Now, let's create the temporary table.
+
 ```sql
 DROP TABLE IF EXISTS deduplicated_user_logs;
 CREATE TEMP TABLE deduplicated_user_logs AS
@@ -63,6 +70,7 @@ FROM health.user_logs;
 None
 
 Let's take a look at the newly created TEMP table with distinct values only.
+
 ```sql
 SELECT * 
 FROM deduplicated_user_logs
@@ -79,6 +87,7 @@ LIMIT 5;
 | 0f7b13f3f0512e6546b8d2c0d56e564a2408536a | 2020-08-18T00:00:00.000Z | weight         | 68.49244787   | 0        | 0         |
 
 The total count of values in the table:
+
 ```sql
 SELECT COUNT(*) 
 FROM deduplicated_user_logs;
@@ -90,15 +99,19 @@ FROM deduplicated_user_logs;
 | 31004 |
 
 ## 2.2 Comparing our output with original data
+
 In our original table, there are **43,891** values whereas in the deduplicated table we got **31,004**.
 
 That means, we definitely have some duplicate values in our dataset.
 
 ## 2.3 Identifying duplicate records
+
 Let us take a look at the duplicate row values from dataset.
 
 ### 2.3.1 Group by count on all columns
+
 Here, we use a group by clause on all the columns and count as our aggregate function. This will give us all the rows along their count i.e. the number of time they appear in the dataset. Let's limit the output to 10.
+
 ```sql
 SELECT
   id,
@@ -135,8 +148,8 @@ LIMIT 10;
 | 054250c692e07a9fa9e62e345231df4b54ff435d | 2019-12-11T00:00:00.000Z | blood_glucose | 220           | null     | null      | 12        |
 | 054250c692e07a9fa9e62e345231df4b54ff435d | 2020-04-15T00:00:00.000Z | blood_glucose | 236           | null     | null      | 12        |
 
-
 ### 2.3.2 Having Clause for Unique Duplicates
+
 ```sql
 DROP TABLE IF EXISTS duplicated_record_count;
 
@@ -178,6 +191,7 @@ LIMIT 10;
 | ee653a96022cc3878e76d196b1667d95beca2db6 | blood_pressure | 111           | 111      | 67        |
 
 ### 2.3.3 Getting all the duplicate counts
+
 ```sql
 WITH groupby_counts AS (
   SELECT
@@ -222,4 +236,3 @@ LIMIT 10;
 ## 2.4 Ignoring Duplicate Records
 
 In this case study, the log date doesn't contain any timestamps. So, it could be that the patient logged on to the online portal and submitted their health measurements at different times throughout a day. Hence, we may just ignore the duplicate values here.
-
